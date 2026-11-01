@@ -3,222 +3,640 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BND Unlimited Madrid</title>
-<meta name="description" content="BND Unlimited Madrid · Reprogramación de vehículos en Madrid. Turismos, competición y banco de potencia.">
+<title>BND Unlimited Madrid · Reprogramación de vehículos</title>
+<meta name="description" content="BND Unlimited Madrid. Reprogramación de centralitas, competición y banco de potencia en Madrid.">
+<meta name="theme-color" content="#050505">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@1,700;1,800;1,900&family=Fira+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@1,800;1,900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --red:#dd3222; --red2:#f0412f;
-    --black:#060606; --bg:#18181b; --bg2:#202024; --card:#111113; --line:#2c2c31;
-    --text:#f4f4f5; --muted:#a6a6ae;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{background:var(--bg);color:var(--text);font-family:"Fira Sans",system-ui,sans-serif;line-height:1.6;overflow-x:hidden}
-  a{color:inherit;text-decoration:none}
-  img{display:block;max-width:100%}
-  .wrap{max-width:1160px;margin:0 auto;padding:0 20px}
-  .h{font-family:"Exo 2",sans-serif;font-style:italic;font-weight:800;text-transform:uppercase;line-height:1.02;letter-spacing:.01em}
+:root{
+  --red:#dd3222; --red-2:#ff4a36; --red-glow:rgba(221,50,34,.55);
+  --ink:#050505; --ink-2:#0c0c0e; --ink-3:#131316;
+  --text:#f5f5f7; --muted:#8e8e96; --line:rgba(255,255,255,.08);
+  --glass:rgba(255,255,255,.045); --glass-line:rgba(255,255,255,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--ink);color:var(--text);font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+::selection{background:var(--red);color:#fff}
+.wrap{width:min(1200px,100% - 40px);margin-inline:auto}
+.brand{font-family:"Exo 2",sans-serif;font-style:italic;font-weight:900;text-transform:uppercase;letter-spacing:.01em}
+.red{color:var(--red)}
+.grad{background:linear-gradient(100deg,#fff 0%,#ffd2cc 35%,var(--red-2) 70%,var(--red) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:var(--muted)}
+.eyebrow:before{content:"";width:28px;height:1px;background:var(--red)}
 
-  .demo{background:#ffd400;color:#111;text-align:center;font-size:13px;font-weight:600;padding:6px 12px}
+/* ---------- 3D canvas ---------- */
+#scene{position:fixed;inset:0;z-index:0;pointer-events:none;transition:opacity .4s}
+.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.06;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+main,footer{position:relative;z-index:2}
 
-  header{position:sticky;top:0;z-index:20;background:var(--black);border-bottom:2px solid var(--red)}
-  .nav{display:flex;align-items:center;justify-content:space-between;height:76px;gap:16px}
-  .nav .logo img{height:46px;width:auto}
-  .social{display:flex;gap:14px}
-  .social a{width:34px;height:34px;display:grid;place-items:center;border-radius:6px;color:var(--red);transition:.2s}
-  .social a:hover{background:var(--red);color:#fff}
-  .social svg{width:20px;height:20px;fill:currentColor}
-  nav ul{display:flex;gap:26px;list-style:none;font-weight:500;font-size:15px;color:var(--muted)}
-  nav a:hover{color:var(--red)}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--red);color:#fff;font-weight:600;padding:13px 24px;border-radius:4px;transition:.2s;border:0;cursor:pointer;font-size:15px;font-family:inherit}
-  .btn:hover{background:var(--red2);transform:translateY(-1px)}
-  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.35)}
-  .btn.ghost:hover{border-color:#fff}
-  @media(max-width:900px){nav ul,.nav .btn{display:none}.nav{justify-content:space-between}.nav .logo img{height:38px}}
+/* ---------- nav ---------- */
+.nav{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:50;width:min(1200px,100% - 24px);
+  display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 12px 10px 20px;border-radius:999px;
+  background:rgba(12,12,14,.55);border:1px solid var(--glass-line);backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);
+  box-shadow:0 10px 40px -10px rgba(0,0,0,.6)}
+.nav .logo img{height:30px;width:auto}
+.nav ul{display:flex;gap:30px;list-style:none;font-size:14px;color:#c7c7cc}
+.nav ul a{transition:color .2s}.nav ul a:hover{color:#fff}
+.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:12px 22px;font-weight:600;font-size:14px;border:0;cursor:pointer;font-family:inherit;transition:transform .25s,box-shadow .25s,background .25s}
+.pill.red{background:linear-gradient(180deg,var(--red-2),var(--red));color:#fff;box-shadow:0 10px 30px -8px var(--red-glow),inset 0 1px 0 rgba(255,255,255,.25)}
+.pill.red:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 16px 40px -8px var(--red-glow),inset 0 1px 0 rgba(255,255,255,.25)}
+.pill.glass{background:var(--glass);border:1px solid var(--glass-line);color:#fff;backdrop-filter:blur(14px)}
+.pill.glass:hover{background:rgba(255,255,255,.09)}
+.pill svg{width:16px;height:16px}
+@media(max-width:860px){.nav ul{display:none}.nav .logo img{height:24px}.nav .pill{padding:10px 16px}}
 
-  .hero{position:relative;min-height:min(86vh,760px);display:flex;align-items:center;text-align:center;
-    background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.75) 70%,var(--bg)),url(dyno.jpg) center/cover no-repeat}
-  .hero .wrap{position:relative;width:100%}
-  .hero h1{font-size:clamp(46px,9vw,112px);font-weight:900}
-  .hero h1 span{color:var(--red)}
-  .hero .sub{font-family:"Exo 2";font-style:italic;font-weight:700;letter-spacing:.18em;text-transform:uppercase;font-size:clamp(15px,2.3vw,24px);margin-top:14px}
-  .hero p{color:#d4d4d8;max-width:600px;margin:22px auto 34px;font-size:clamp(16px,1.8vw,18px)}
-  .cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
-  .down{display:block;width:36px;margin:54px auto 0;opacity:.85;animation:b 2s infinite}
-  @keyframes b{50%{transform:translateY(8px)}}
+/* ---------- hero ---------- */
+.hero{min-height:100svh;display:flex;align-items:flex-end;padding:140px 0 9vh;position:relative}
+.hero:after{content:"";position:absolute;inset:auto 0 0 0;height:40%;background:linear-gradient(transparent,var(--ink));pointer-events:none;z-index:-1}
+.hero h1{font-size:clamp(52px,10.5vw,168px);line-height:.86;letter-spacing:-.01em}
+.hero h1 .line{display:block;overflow:hidden;padding:.04em .1em .04em 0}
+.hero h1 .line > span{display:inline-block}
+.hero .lead{max-width:470px;color:#c7c7cc;font-size:clamp(16px,1.5vw,19px);margin:28px 0 34px}
+.hero .row{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;flex-wrap:wrap}
+.hero .cta{display:flex;gap:12px;flex-wrap:wrap}
+.scroll-hint{display:flex;flex-direction:column;align-items:center;gap:10px;font-size:11px;letter-spacing:.3em;color:var(--muted);text-transform:uppercase}
+.scroll-hint i{width:1px;height:56px;background:linear-gradient(var(--red),transparent);animation:drip 2s infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@media(max-width:700px){.scroll-hint{display:none}.hero{align-items:flex-end;padding-bottom:7vh}}
 
-  section{padding:96px 0}
-  .title{text-align:center;margin-bottom:54px}
-  .title h2{font-size:clamp(40px,6vw,68px);color:var(--red)}
-  .title p{color:var(--muted);max-width:600px;margin:14px auto 0}
+/* ---------- statement (apple word reveal) ---------- */
+.statement{min-height:100vh;display:flex;align-items:center;padding:16vh 0}
+.statement p{font-size:clamp(34px,5.6vw,84px);font-weight:700;line-height:1.08;letter-spacing:-.035em;max-width:1100px}
+.statement .w{opacity:.12;transition:none}
+.statement .w.red{color:var(--red)}
 
-  .svc{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:28px}
-  .svc article{background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden;transition:.25s;display:flex;flex-direction:column}
-  .svc article:hover{border-color:var(--red);transform:translateY(-4px)}
-  .svc img{aspect-ratio:16/8;object-fit:cover;width:100%}
-  .svc .body{padding:28px 30px 34px;text-align:center}
-  .svc h3{font-size:clamp(30px,4vw,40px);color:var(--red);margin-bottom:12px}
-  .svc p{color:#e4e4e7;font-size:16.5px}
-  .svc b{font-weight:600}
+/* ---------- marquee ---------- */
+.marquee{border-block:1px solid var(--line);padding:26px 0;overflow:hidden;background:rgba(5,5,5,.6);backdrop-filter:blur(6px)}
+.marquee .track{display:flex;gap:56px;width:max-content;animation:mq 30s linear infinite}
+.marquee span{font-size:clamp(28px,4vw,52px);white-space:nowrap;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.35)}
+.marquee span.f{color:var(--red);-webkit-text-stroke:0}
+@keyframes mq{to{transform:translateX(-50%)}}
 
-  .band{background:var(--black);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-  .split{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:center}
-  @media(max-width:860px){.split{grid-template-columns:1fr}}
-  .split img{border-radius:6px;border:1px solid var(--line)}
-  .split h2{font-size:clamp(36px,5vw,56px)}
-  .split h2 span{color:var(--red)}
-  .split p{color:var(--muted);margin:18px 0 26px}
-  .checks{list-style:none;display:grid;gap:10px;margin-bottom:30px}
-  .checks li{padding-left:28px;position:relative}
-  .checks li:before{content:"";position:absolute;left:0;top:7px;width:14px;height:10px;border-left:3px solid var(--red);border-bottom:3px solid var(--red);transform:rotate(-45deg)}
+/* ---------- sections ---------- */
+section.block{padding:clamp(90px,14vh,160px) 0;background:var(--ink)}
+.head{max-width:760px;margin-bottom:64px}
+.head h2{font-size:clamp(40px,6vw,88px);font-weight:800;letter-spacing:-.04em;line-height:.98;margin-top:18px}
+.head p{color:var(--muted);font-size:clamp(16px,1.4vw,19px);margin-top:20px;max-width:560px}
+.reveal{opacity:0;transform:translateY(40px)}
 
-  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:22px;counter-reset:s}
-  .step{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--red);padding:28px;border-radius:4px}
-  .step:before{counter-increment:s;content:"0" counter(s);font-family:"Exo 2";font-style:italic;font-weight:900;font-size:42px;color:#36363c;display:block;line-height:1}
-  .step h3{font-size:24px;margin:10px 0 8px}
-  .step p{color:var(--muted);font-size:15px}
+/* services 3D tilt cards */
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;perspective:1400px}
+@media(max-width:860px){.cards{grid-template-columns:1fr}}
+.card{position:relative;border-radius:28px;overflow:hidden;background:var(--ink-3);border:1px solid var(--line);transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s;min-height:560px;display:flex;flex-direction:column;justify-content:flex-end;isolation:isolate}
+.card:hover{box-shadow:0 40px 80px -30px var(--red-glow)}
+.card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transform:scale(1.12);transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.card:hover img{transform:scale(1.04)}
+.card:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(5,5,5,.05) 0%,rgba(5,5,5,.55) 45%,rgba(5,5,5,.97) 78%)}
+.card .glare{position:absolute;inset:0;z-index:3;pointer-events:none;background:radial-gradient(600px circle at var(--mx,50%) var(--my,0%),rgba(255,255,255,.12),transparent 40%);opacity:0;transition:opacity .4s}
+.card:hover .glare{opacity:1}
+.card .in{padding:40px;transform:translateZ(60px)}
+.card .num{font-size:13px;font-weight:600;color:var(--red);letter-spacing:.2em}
+.card h3{font-size:clamp(40px,4.4vw,64px);margin:6px 0 14px;line-height:1}
+.card p{color:#d1d1d6;font-size:16px;max-width:480px}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.tags span{font-size:12px;font-weight:500;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--glass-line);backdrop-filter:blur(10px)}
+@media(max-width:600px){.card{min-height:500px}.card .in{padding:28px}}
 
-  .contact{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
-  @media(max-width:860px){.contact{grid-template-columns:1fr}}
-  .info{display:grid;gap:14px}
-  .info div{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--red);padding:18px 20px;border-radius:4px}
-  .info small{display:block;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
-  .info b{font-size:17px;font-weight:600}
-  form{background:var(--card);border:1px solid var(--line);padding:28px;border-radius:6px;display:grid;gap:14px}
-  form h3{font-size:28px}
-  input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);padding:13px 14px;border-radius:4px;font:inherit;font-size:15px}
-  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--red)}
-  textarea{min-height:110px;resize:vertical}
+/* dyno */
+.dyno{display:grid;grid-template-columns:.9fr 1.1fr;gap:60px;align-items:center}
+@media(max-width:900px){.dyno{grid-template-columns:1fr}}
+.chart{position:relative;border-radius:28px;padding:30px;background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.015));border:1px solid var(--glass-line);backdrop-filter:blur(20px)}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.chart .legend{display:flex;gap:22px;font-size:13px;color:var(--muted);margin-bottom:16px;flex-wrap:wrap}
+.chart .legend b{display:inline-block;width:22px;height:3px;border-radius:3px;vertical-align:middle;margin-right:8px}
+.chart small{display:block;margin-top:14px;font-size:11px;color:#5d5d63;letter-spacing:.06em}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:40px}
+.stat{padding:22px;border-radius:20px;background:var(--glass);border:1px solid var(--glass-line)}
+.stat b{display:block;font-size:22px;font-weight:700;letter-spacing:-.02em}
+.stat span{font-size:13px;color:var(--muted)}
+@media(max-width:520px){.stats{grid-template-columns:1fr}}
 
-  footer{background:var(--black);border-top:2px solid var(--red);padding:36px 0;color:var(--muted);font-size:14px}
-  footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
-  footer img{height:34px;width:auto}
+/* image expand */
+.expand{height:220vh;position:relative;background:var(--ink)}
+.expand .sticky{position:sticky;top:0;height:100vh;display:grid;place-items:center;overflow:hidden}
+.expand .frame{position:absolute;inset:0;clip-path:inset(22% 24% 22% 24% round 36px);will-change:clip-path}
+.expand .frame img{width:100%;height:100%;object-fit:cover;transform:scale(1.3);will-change:transform}
+.expand .frame:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 30%,rgba(5,5,5,.75))}
+.expand .label{position:relative;z-index:2;text-align:center;pointer-events:none}
+.expand .label h2{font-size:clamp(48px,11vw,180px);line-height:.88;text-shadow:0 10px 60px rgba(0,0,0,.6)}
+.expand .label p{color:#e5e5ea;margin-top:20px;font-size:clamp(15px,1.4vw,19px)}
+@media(max-width:700px){.expand .frame{clip-path:inset(28% 8% 28% 8% round 24px)}}
 
-  .wa{position:fixed;right:18px;bottom:18px;z-index:30;width:60px;height:60px;border-radius:50%;background:var(--red);display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.5);transition:.2s}
-  .wa:hover{transform:scale(1.06)}
-  .wa svg{width:32px;height:32px;fill:#fff}
+/* horizontal process */
+.hz{position:relative;background:var(--ink);overflow:hidden}
+.hz .pin{height:100vh;display:flex;flex-direction:column;justify-content:center;gap:40px;padding-top:70px}
+.hz .track{display:flex;gap:24px;padding-left:max(20px,(100vw - 1200px)/2);width:max-content;will-change:transform}
+.step{width:min(440px,78vw);height:min(460px,56vh);flex-shrink:0;border-radius:28px;padding:36px;display:flex;flex-direction:column;justify-content:space-between;
+  background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.015));border:1px solid var(--glass-line);position:relative;overflow:hidden}
+.step:after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;background:var(--red);filter:blur(110px);opacity:.25;right:-80px;top:-80px}
+.step .n{font-size:110px;line-height:.8;color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.22)}
+.step h3{font-size:32px;font-weight:700;letter-spacing:-.03em;margin-bottom:10px}
+.step p{color:var(--muted);font-size:16px}
+@media(max-width:860px){.hz .pin{height:auto;padding:100px 0}.hz .track{flex-direction:column;width:auto;padding:0 20px}.step{width:100%;height:auto;min-height:280px;gap:40px}}
+
+/* cta */
+.cta-block{position:relative;padding:clamp(110px,18vh,200px) 0;text-align:center;overflow:hidden;background:var(--ink)}
+.cta-block:before{content:"";position:absolute;left:50%;top:50%;width:900px;height:900px;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(221,50,34,.35),transparent 60%);filter:blur(40px)}
+.cta-block h2{position:relative;font-size:clamp(46px,9vw,140px);line-height:.9}
+.cta-block p{position:relative;color:#c7c7cc;margin:24px auto 40px;max-width:520px;font-size:18px}
+.cta-block .cta{position:relative;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+/* contact */
+.contact{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:860px){.contact{grid-template-columns:1fr}}
+.panel{border-radius:28px;padding:36px;background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.015));border:1px solid var(--glass-line)}
+.info-row{display:flex;gap:16px;padding:20px 0;border-bottom:1px solid var(--line)}
+.info-row:last-child{border:0}
+.info-row .ic{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:rgba(221,50,34,.12);color:var(--red);flex-shrink:0}
+.info-row .ic svg{width:20px;height:20px}
+.info-row small{display:block;font-size:12px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.info-row b{font-weight:600;font-size:17px}
+form{display:grid;gap:12px}
+form h3{font-size:28px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.two{grid-template-columns:1fr}}
+input,select,textarea{width:100%;background:rgba(0,0,0,.35);border:1px solid var(--glass-line);color:var(--text);padding:15px 16px;border-radius:14px;font:inherit;font-size:15px;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 4px rgba(221,50,34,.15)}
+textarea{min-height:110px;resize:vertical}
+form .pill{justify-content:center;padding:16px}
+
+footer{border-top:1px solid var(--line);padding:40px 0;background:var(--ink);color:var(--muted);font-size:13px}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+footer img{height:26px}
+.soc{display:flex;gap:10px}
+.soc a{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--glass);border:1px solid var(--glass-line);transition:.2s}
+.soc a:hover{background:var(--red);border-color:var(--red);color:#fff}
+.soc svg{width:18px;height:18px;fill:currentColor}
+
+.wa{position:fixed;right:20px;bottom:20px;z-index:60;width:60px;height:60px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(180deg,var(--red-2),var(--red));box-shadow:0 12px 30px -6px var(--red-glow);transition:transform .25s}
+.wa:hover{transform:scale(1.08)}
+.wa svg{width:30px;height:30px;fill:#fff}
+
+.loader{position:fixed;inset:0;z-index:100;background:var(--ink);display:grid;place-items:center;transition:opacity .8s,visibility .8s}
+.loader.done{opacity:0;visibility:hidden}
+.loader img{width:min(260px,60vw);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.45;filter:drop-shadow(0 0 30px var(--red-glow))}}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}.statement .w{opacity:1}}
 </style>
+<script type="importmap">{"imports":{"three":"./vendor/three.module.min.js"}}</script>
 </head>
 <body>
 
-<div class="demo">Propuesta de diseño · versión provisional</div>
+<div class="loader" id="loader"><img src="logo-t.png" alt="BND Unlimited"></div>
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="grain"></div>
 
-<header>
-  <div class="wrap nav">
-    <div class="social">
-      <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8C2.4 3.9 3.9 2.4 7.2 2.3 8.4 2.2 8.8 2.2 12 2.2zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7 1.2.1 1.6.1 4.9.1s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 0 0 0-12.4zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-11.8a1.4 1.4 0 1 0 0 2.9 1.4 1.4 0 0 0 0-2.9z"/></svg></a>
-      <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg></a>
-    </div>
-    <a href="#" class="logo"><img src="logo.png" alt="BND Unlimited"></a>
-    <nav><ul>
-      <li><a href="#servicios">Servicios</a></li>
-      <li><a href="#banco">Banco de potencia</a></li>
-      <li><a href="#contacto">Contacto</a></li>
-    </ul></nav>
-    <a href="#contacto" class="btn">Pide cita</a>
-  </div>
+<header class="nav">
+  <a href="#" class="logo"><img src="logo-t.png" alt="BND Unlimited"></a>
+  <ul>
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#banco">Banco de potencia</a></li>
+    <li><a href="#proceso">Proceso</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+  <a href="#contacto" class="pill red">Pide cita</a>
 </header>
 
-<section class="hero">
-  <div class="wrap">
-    <h1 class="h">BND Unlimited<br><span>Madrid</span></h1>
-    <div class="sub">Reprogramación de vehículos</div>
-    <p>Más potencia y más par sin perder fiabilidad. Mapas a medida, probados en nuestro banco de potencia.</p>
-    <div class="cta">
-      <a href="#contacto" class="btn">Pide presupuesto</a>
-      <a href="#servicios" class="btn ghost">Nuestros servicios</a>
-    </div>
-    <a href="#servicios" class="down" aria-label="Bajar"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8l8 8 8-8"/></svg></a>
-  </div>
-</section>
-
-<section id="servicios">
-  <div class="wrap">
-    <div class="title"><h2 class="h">Nuestros servicios</h2></div>
-    <div class="svc">
-      <article>
-        <img src="audi.jpg" alt="Audi en el banco de potencia de BND Madrid">
-        <div class="body">
-          <h3 class="h">Turismos</h3>
-          <p>Ponemos a tu disposición la tecnología y profesionalidad necesarios para que puedas reprogramar tu coche optimizando sus parámetros: <b>aumento de potencia y par</b> manteniendo la <b>fiabilidad</b>, <b>reducción de consumo</b>, o <b>potenciaciones extremas</b>.</p>
+<main>
+  <!-- HERO -->
+  <section class="hero" id="top">
+    <div class="wrap">
+      <span class="eyebrow reveal-hero">Reprogramación de vehículos · Madrid</span>
+      <h1 class="brand" style="margin-top:22px">
+        <span class="line"><span>Sin</span></span>
+        <span class="line"><span class="grad">límites.</span></span>
+      </h1>
+      <div class="row">
+        <div>
+          <p class="lead reveal-hero">Mapas a medida para tu centralita, probados en nuestro banco de potencia. Más potencia y más par, manteniendo la fiabilidad.</p>
+          <div class="cta reveal-hero">
+            <a href="#contacto" class="pill red">Pide presupuesto
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <a href="#servicios" class="pill glass">Descubre más</a>
+          </div>
         </div>
-      </article>
-      <article>
-        <img src="bmw.jpg" alt="BMW en el banco de potencia de BND Madrid">
-        <div class="body">
-          <h3 class="h">Competición</h3>
-          <p>Cuando el rendimiento ha de ser maximizado, los ajustes tienen que ser milimétricos y no existe espacio para el error. Por ello ponemos a tu disposición un equipo humano altamente cualificado y los equipos más modernos para monitorizar todos los parámetros durante el desarrollo.</p>
-        </div>
-      </article>
-    </div>
-  </div>
-</section>
-
-<section id="banco" class="band">
-  <div class="wrap split">
-    <img src="dyno.jpg" alt="Banco de potencia de BND Madrid">
-    <div>
-      <h2 class="h">Banco de <span>potencia</span></h2>
-      <p>Medimos tu coche antes y después de reprogramarlo. Sin promesas en el aire: lo que gana tu coche lo ves en la pantalla.</p>
-      <ul class="checks">
-        <li>Medición de potencia y par reales</li>
-        <li>Ajuste del mapa con el coche en el rodillo</li>
-        <li>Control de todos los parámetros del motor</li>
-      </ul>
-      <a href="#contacto" class="btn">Reserva tu medición</a>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="title"><h2 class="h">Cómo trabajamos</h2></div>
-    <div class="steps">
-      <div class="step"><h3 class="h">Diagnosis</h3><p>Revisamos el coche y comprobamos que está sano antes de empezar.</p></div>
-      <div class="step"><h3 class="h">Medición</h3><p>Pasamos por el banco para saber de dónde partimos.</p></div>
-      <div class="step"><h3 class="h">Mapa a medida</h3><p>Ajustamos la centralita para tu motor y lo que buscas.</p></div>
-      <div class="step"><h3 class="h">Verificación</h3><p>Volvemos a medir y te entregamos el coche con los resultados.</p></div>
-    </div>
-  </div>
-</section>
-
-<section id="contacto" class="band">
-  <div class="wrap contact">
-    <div>
-      <div class="title" style="text-align:left;margin-bottom:28px">
-        <h2 class="h">Contacto</h2>
-        <p style="margin-left:0">Dinos marca, modelo, año y motor, y te contamos qué se puede hacer con tu coche.</p>
-      </div>
-      <div class="info">
-        <div><small>Dirección</small><b>[Dirección del taller], Madrid</b></div>
-        <div><small>Teléfono / WhatsApp</small><b>[600 000 000]</b></div>
-        <div><small>Horario</small><b>[Horario]</b></div>
+        <div class="scroll-hint reveal-hero"><span>Scroll</span><i></i></div>
       </div>
     </div>
-    <form onsubmit="event.preventDefault();this.querySelector('button').textContent='¡Recibido! Te contactamos pronto';">
-      <h3 class="h">Pide presupuesto</h3>
-      <input placeholder="Nombre" required>
-      <input placeholder="Teléfono" type="tel" required>
-      <input placeholder="Coche (marca, modelo, año, motor)" required>
-      <select><option>Turismo</option><option>Competición</option><option>Banco de potencia</option><option>Otro</option></select>
-      <textarea placeholder="Cuéntanos qué buscas"></textarea>
-      <button class="btn" type="submit">Enviar</button>
-    </form>
+  </section>
+
+  <!-- STATEMENT -->
+  <section class="statement">
+    <div class="wrap">
+      <p id="words">Cada motor sale de fábrica con potencia guardada. Nosotros la liberamos con <span class="red">precisión milimétrica</span>, medida en banco y sin comprometer la <span class="red">fiabilidad</span>.</p>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="track brand">
+      <span>Reprogramación ECU</span><span class="f">✦</span><span>Banco de potencia</span><span class="f">✦</span><span>Competición</span><span class="f">✦</span><span>Turismos</span><span class="f">✦</span>
+      <span>Reprogramación ECU</span><span class="f">✦</span><span>Banco de potencia</span><span class="f">✦</span><span>Competición</span><span class="f">✦</span><span>Turismos</span><span class="f">✦</span>
+    </div>
   </div>
-</section>
+
+  <!-- SERVICES -->
+  <section class="block" id="servicios">
+    <div class="wrap">
+      <div class="head reveal">
+        <span class="eyebrow">Servicios</span>
+        <h2>Dos formas de ir<br><span class="red">más rápido.</span></h2>
+      </div>
+      <div class="cards">
+        <article class="card reveal" data-tilt>
+          <img src="audi.jpg" alt="Audi en el banco de potencia de BND Madrid" loading="lazy">
+          <div class="glare"></div>
+          <div class="in">
+            <span class="num">01</span>
+            <h3 class="brand">Turismos</h3>
+            <p>Ponemos a tu disposición la tecnología y profesionalidad necesarios para reprogramar tu coche optimizando sus parámetros.</p>
+            <div class="tags"><span>Aumento de potencia y par</span><span>Fiabilidad</span><span>Reducción de consumo</span><span>Potenciaciones extremas</span></div>
+          </div>
+        </article>
+        <article class="card reveal" data-tilt>
+          <img src="bmw.jpg" alt="BMW en el banco de potencia de BND Madrid" loading="lazy">
+          <div class="glare"></div>
+          <div class="in">
+            <span class="num">02</span>
+            <h3 class="brand">Competición</h3>
+            <p>Cuando el rendimiento ha de ser maximizado, los ajustes tienen que ser milimétricos y no existe espacio para el error.</p>
+            <div class="tags"><span>Equipo altamente cualificado</span><span>Equipos de última generación</span><span>Monitorización total</span></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- DYNO -->
+  <section class="block" style="padding-top:0">
+    <div class="wrap dyno">
+      <div class="reveal">
+        <span class="eyebrow">Resultados medidos</span>
+        <h2 style="font-size:clamp(40px,5.4vw,80px);font-weight:800;letter-spacing:-.04em;line-height:.98;margin-top:18px">No te lo<br>contamos.<br><span class="red">Te lo enseñamos.</span></h2>
+        <p style="color:var(--muted);font-size:18px;margin-top:22px;max-width:460px">Medimos tu coche antes y después en el banco. Lo que gana, lo ves en la pantalla.</p>
+        <div class="stats">
+          <div class="stat"><b>Antes</b><span>Medición de serie</span></div>
+          <div class="stat"><b>Mapa</b><span>Ajustado a tu motor</span></div>
+          <div class="stat"><b class="red">Después</b><span>Medición final</span></div>
+        </div>
+      </div>
+      <div class="chart reveal">
+        <div class="legend"><span><b style="background:#5d5d63"></b>De serie</span><span><b style="background:var(--red)"></b>Reprogramado BND</span></div>
+        <svg viewBox="0 0 600 340" id="dyno">
+          <defs>
+            <linearGradient id="fillR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dd3222" stop-opacity=".35"/><stop offset="1" stop-color="#dd3222" stop-opacity="0"/></linearGradient>
+          </defs>
+          <g stroke="rgba(255,255,255,.07)" stroke-width="1">
+            <line x1="0" y1="60" x2="600" y2="60"/><line x1="0" y1="130" x2="600" y2="130"/><line x1="0" y1="200" x2="600" y2="200"/><line x1="0" y1="270" x2="600" y2="270"/>
+            <line x1="120" y1="20" x2="120" y2="310"/><line x1="240" y1="20" x2="240" y2="310"/><line x1="360" y1="20" x2="360" y2="310"/><line x1="480" y1="20" x2="480" y2="310"/>
+          </g>
+          <path id="fillArea" d="M0 300 C 80 240, 140 120, 230 80 S 420 50, 600 95 L600 310 L0 310Z" fill="url(#fillR)" opacity="0"/>
+          <path id="curveA" d="M0 300 C 90 260, 150 170, 240 145 S 430 130, 600 170" fill="none" stroke="#5d5d63" stroke-width="3" stroke-linecap="round"/>
+          <path id="curveB" d="M0 300 C 80 240, 140 120, 230 80 S 420 50, 600 95" fill="none" stroke="#dd3222" stroke-width="4" stroke-linecap="round" style="filter:drop-shadow(0 0 10px rgba(221,50,34,.8))"/>
+          <text x="0" y="330" fill="#5d5d63" font-size="12">RPM →</text>
+        </svg>
+        <small>CURVA ILUSTRATIVA · LOS RESULTADOS REALES DEPENDEN DE CADA VEHÍCULO</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- IMAGE EXPAND -->
+  <section class="expand" id="banco">
+    <div class="sticky">
+      <div class="frame"><img src="dyno.jpg" alt="Banco de potencia de BND Madrid"></div>
+      <div class="label">
+        <h2 class="brand">Banco de<br><span class="red">potencia</span></h2>
+        <p>Nuestro propio rodillo. Cada ajuste, verificado.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="hz" id="proceso">
+    <div class="pin">
+      <div class="wrap head" style="margin-bottom:0">
+        <span class="eyebrow">El proceso</span>
+        <h2>Cuatro pasos.<br><span class="red">Cero sorpresas.</span></h2>
+      </div>
+      <div class="track">
+        <div class="step"><span class="n brand">01</span><div><h3>Diagnosis</h3><p>Revisamos el coche y comprobamos que está sano antes de tocar nada.</p></div></div>
+        <div class="step"><span class="n brand">02</span><div><h3>Medición inicial</h3><p>Pasamos por el banco para saber exactamente de dónde partimos.</p></div></div>
+        <div class="step"><span class="n brand">03</span><div><h3>Mapa a medida</h3><p>Ajustamos la centralita para tu motor, tus piezas y lo que buscas.</p></div></div>
+        <div class="step"><span class="n brand">04</span><div><h3>Verificación</h3><p>Volvemos a medir y te entregamos el coche con los resultados.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-block">
+    <div class="wrap">
+      <h2 class="brand reveal">¿Listo para<br><span class="grad">desbloquearlo?</span></h2>
+      <p class="reveal">Cuéntanos qué coche tienes y te decimos qué se puede hacer.</p>
+      <div class="cta reveal"><a href="#contacto" class="pill red">Pide presupuesto</a><a href="#contacto" class="pill glass">Escríbenos por WhatsApp</a></div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="block" id="contacto" style="padding-top:0">
+    <div class="wrap contact">
+      <div class="panel reveal">
+        <span class="eyebrow">Contacto</span>
+        <h3 style="font-size:clamp(32px,3.6vw,48px);font-weight:800;letter-spacing:-.04em;line-height:1;margin:16px 0 18px">Ven a vernos.</h3>
+        <div class="info-row"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg></div><div><small>Dirección</small><b>[Dirección del taller], Madrid</b></div></div>
+        <div class="info-row"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></div><div><small>Teléfono / WhatsApp</small><b>[600 000 000]</b></div></div>
+        <div class="info-row"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div><small>Horario</small><b>[Horario]</b></div></div>
+      </div>
+      <div class="panel reveal">
+        <form onsubmit="event.preventDefault();this.querySelector('button').textContent='¡Recibido! Te contactamos pronto';">
+          <h3>Pide presupuesto</h3>
+          <div class="two"><input placeholder="Nombre" required><input placeholder="Teléfono" type="tel" required></div>
+          <input placeholder="Coche (marca, modelo, año, motor)" required>
+          <select><option>Turismo</option><option>Competición</option><option>Banco de potencia</option><option>Otro</option></select>
+          <textarea placeholder="Cuéntanos qué buscas"></textarea>
+          <button class="pill red" type="submit">Enviar solicitud</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
 
 <footer>
   <div class="wrap">
-    <img src="logo.png" alt="BND Unlimited">
+    <img src="logo-t.png" alt="BND Unlimited">
     <span>© 2026 BND Unlimited Madrid · Reprogramación de vehículos</span>
+    <div class="soc">
+      <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8C2.4 3.9 3.9 2.4 7.2 2.3 8.4 2.2 8.8 2.2 12 2.2zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7 1.2.1 1.6.1 4.9.1s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 0 0 0-12.4zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-11.8a1.4 1.4 0 1 0 0 2.9 1.4 1.4 0 0 0 0-2.9z"/></svg></a>
+      <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg></a>
+    </div>
   </div>
 </footer>
 
-<a class="wa" href="#contacto" aria-label="WhatsApp">
-  <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>
-</a>
+<a class="wa" href="#contacto" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg></a>
 
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollTrigger.min.js"></script>
+<script>
+/* ---------- UI animations (GSAP) ---------- */
+(function(){
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const loader = document.getElementById('loader');
+  const hideLoader = () => loader.classList.add('done');
+  window.addEventListener('load', () => setTimeout(hideLoader, 350));
+  setTimeout(hideLoader, 3500);
+
+  // split statement into words
+  const p = document.getElementById('words');
+  const wrapWords = (node) => {
+    [...node.childNodes].forEach(n => {
+      if (n.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach(t => {
+          if (!t.trim()) { frag.appendChild(document.createTextNode(t)); return; }
+          const s = document.createElement('span'); s.className = 'w'; s.textContent = t; frag.appendChild(s);
+        });
+        n.replaceWith(frag);
+      } else if (n.nodeType === 1) { n.classList.add('w'); }
+    });
+  };
+  wrapWords(p);
+
+  if (!window.gsap || reduce) {
+    document.querySelectorAll('.reveal,.reveal-hero').forEach(e => { e.style.opacity = 1; e.style.transform = 'none'; });
+    document.querySelectorAll('.statement .w').forEach(e => e.style.opacity = 1);
+    return;
+  }
+  gsap.registerPlugin(ScrollTrigger);
+
+  // hero intro
+  gsap.from('.hero h1 .line > span', {yPercent: 110, duration: 1.3, ease: 'expo.out', stagger: .12, delay: .5});
+  gsap.from('.reveal-hero', {opacity: 0, y: 24, duration: 1, ease: 'power3.out', stagger: .1, delay: .9});
+  gsap.from('.nav', {y: -80, opacity: 0, duration: 1, ease: 'expo.out', delay: .4});
+
+  // statement: words light up on scroll
+  gsap.to('.statement .w', {opacity: 1, stagger: .1, ease: 'none',
+    scrollTrigger: {trigger: '.statement', start: 'top 70%', end: 'bottom 70%', scrub: true}});
+
+  // generic reveals
+  gsap.utils.toArray('.reveal').forEach(el => {
+    gsap.to(el, {opacity: 1, y: 0, duration: 1.1, ease: 'power3.out', scrollTrigger: {trigger: el, start: 'top 88%'}});
+  });
+
+  // dyno curves draw
+  ['curveA', 'curveB'].forEach((id, i) => {
+    const path = document.getElementById(id), len = path.getTotalLength();
+    path.style.strokeDasharray = len; path.style.strokeDashoffset = len;
+    gsap.to(path, {strokeDashoffset: 0, ease: 'none', scrollTrigger: {trigger: '#dyno', start: 'top 80%', end: 'bottom 45%', scrub: 1 + i * .3}});
+  });
+  gsap.to('#fillArea', {opacity: 1, scrollTrigger: {trigger: '#dyno', start: 'top 40%', end: 'bottom 40%', scrub: true}});
+
+  // image expand
+  const mobile = matchMedia('(max-width:700px)').matches;
+  gsap.fromTo('.expand .frame', {clipPath: mobile ? 'inset(28% 8% 28% 8% round 24px)' : 'inset(22% 24% 22% 24% round 36px)'},
+    {clipPath: 'inset(0% 0% 0% 0% round 0px)', ease: 'none', scrollTrigger: {trigger: '.expand', start: 'top top', end: '60% top', scrub: true}});
+  gsap.to('.expand .frame img', {scale: 1, ease: 'none', scrollTrigger: {trigger: '.expand', start: 'top top', end: 'bottom bottom', scrub: true}});
+  gsap.from('.expand .label', {scale: .8, opacity: 0, ease: 'none', scrollTrigger: {trigger: '.expand', start: 'top 60%', end: 'top top', scrub: true}});
+
+  // horizontal process
+  ScrollTrigger.matchMedia({
+    '(min-width: 861px)': function(){
+      const track = document.querySelector('.hz .track');
+      const dist = () => track.scrollWidth - innerWidth + Math.max(20, (innerWidth - 1200) / 2);
+      gsap.to(track, {x: () => -dist(), ease: 'none',
+        scrollTrigger: {trigger: '.hz', pin: '.hz .pin', start: 'top top', end: () => '+=' + dist(), scrub: 1, invalidateOnRefresh: true}});
+    }
+  });
+
+  // 3D tilt cards
+  if (matchMedia('(hover:hover)').matches) {
+    document.querySelectorAll('[data-tilt]').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+        card.style.transform = `rotateY(${(x - .5) * 12}deg) rotateX(${(.5 - y) * 10}deg)`;
+        card.style.setProperty('--mx', x * 100 + '%'); card.style.setProperty('--my', y * 100 + '%');
+      });
+      card.addEventListener('mouseleave', () => card.style.transform = '');
+    });
+  }
+  window.addEventListener('load', () => ScrollTrigger.refresh());
+})();
+</script>
+
+<script type="module">
+/* ---------- 3D wheel scene (three.js) ---------- */
+import * as THREE from 'three';
+import { RoomEnvironment } from './vendor/RoomEnvironment.js';
+
+const canvas = document.getElementById('scene');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let renderer;
+try { renderer = new THREE.WebGLRenderer({canvas, antialias: true, alpha: false, powerPreference: 'high-performance'}); }
+catch (e) { canvas.remove(); throw e; }
+renderer.setPixelRatio(Math.min(devicePixelRatio, innerWidth < 700 ? 1.5 : 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.setClearColor(0x050505, 1);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x050505, 9, 26);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), .04).texture;
+
+const camera = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, .1, 100);
+camera.position.set(0, 0, 10);
+
+/* materials */
+const RED = 0xdd3222;
+const chrome = new THREE.MeshStandardMaterial({color: 0x1b1b1f, metalness: 1, roughness: .22});
+const satin  = new THREE.MeshStandardMaterial({color: 0x2a2a30, metalness: .9, roughness: .38});
+const rubber = new THREE.MeshStandardMaterial({color: 0x0d0d0f, metalness: 0, roughness: .85});
+const disc   = new THREE.MeshStandardMaterial({color: 0x6b6b72, metalness: 1, roughness: .32});
+const redMat = new THREE.MeshStandardMaterial({color: RED, metalness: .4, roughness: .3, emissive: RED, emissiveIntensity: .12});
+
+/* wheel */
+const wheel = new THREE.Group();
+const spin = new THREE.Group();
+wheel.add(spin);
+
+// tyre via lathe profile (rotated so axle = z)
+const tyreProfile = [];
+const R0 = 1.55, R1 = 2.05, W = .62;
+for (let i = 0; i <= 24; i++) {
+  const t = i / 24 * Math.PI;
+  tyreProfile.push(new THREE.Vector2(R0 + (R1 - R0) * Math.sin(t) * (.85 + .15 * Math.sin(t)), -W + 2 * W * (i / 24)));
+}
+const tyre = new THREE.Mesh(new THREE.LatheGeometry(tyreProfile, 96), rubber);
+tyre.rotation.x = Math.PI / 2;
+spin.add(tyre);
+// sidewall red stripe
+const stripe = new THREE.Mesh(new THREE.TorusGeometry(1.86, .012, 8, 160), redMat);
+stripe.position.z = .52; spin.add(stripe);
+
+// rim barrel + lip
+const barrel = new THREE.Mesh(new THREE.CylinderGeometry(1.52, 1.52, 1.1, 96, 1, true), satin);
+barrel.rotation.x = Math.PI / 2; spin.add(barrel);
+const lip = new THREE.Mesh(new THREE.TorusGeometry(1.52, .07, 16, 128), chrome);
+lip.position.z = .5; spin.add(lip);
+const lip2 = lip.clone(); lip2.position.z = -.5; spin.add(lip2);
+
+// spokes: 5 split spokes
+const spokeGeo = new THREE.BoxGeometry(1.25, .16, .14);
+spokeGeo.translate(.625 + .32, 0, 0);
+for (let i = 0; i < 5; i++) {
+  for (const off of [-.11, .11]) {
+    const s = new THREE.Mesh(spokeGeo, chrome);
+    const a = i / 5 * Math.PI * 2 + off;
+    s.rotation.z = a; s.position.z = .38;
+    s.rotation.y = -.12;
+    spin.add(s);
+  }
+}
+// hub + cap + lug nuts
+const hub = new THREE.Mesh(new THREE.CylinderGeometry(.42, .46, .3, 48), chrome);
+hub.rotation.x = Math.PI / 2; hub.position.z = .42; spin.add(hub);
+const cap = new THREE.Mesh(new THREE.CylinderGeometry(.2, .2, .06, 40), redMat);
+cap.rotation.x = Math.PI / 2; cap.position.z = .59; spin.add(cap);
+for (let i = 0; i < 5; i++) {
+  const n = new THREE.Mesh(new THREE.CylinderGeometry(.055, .055, .1, 6), satin);
+  const a = i / 5 * Math.PI * 2 + Math.PI / 5;
+  n.rotation.x = Math.PI / 2; n.position.set(Math.cos(a) * .3, Math.sin(a) * .3, .6); spin.add(n);
+}
+// brake disc (spins) with drilled look
+const brake = new THREE.Mesh(new THREE.CylinderGeometry(1.18, 1.18, .08, 96), disc);
+brake.rotation.x = Math.PI / 2; brake.position.z = -.05; spin.add(brake);
+const holeMat = new THREE.MeshBasicMaterial({color: 0x111111});
+for (let i = 0; i < 36; i++) {
+  const h = new THREE.Mesh(new THREE.CircleGeometry(.028, 10), holeMat);
+  const a = i / 36 * Math.PI * 2, r = i % 2 ? .82 : .98;
+  h.position.set(Math.cos(a) * r, Math.sin(a) * r, -.005); spin.add(h);
+}
+// caliper (static)
+const caliper = new THREE.Mesh(new THREE.TorusGeometry(1.08, .16, 16, 40, Math.PI / 2.6), redMat);
+caliper.rotation.z = Math.PI / 6; caliper.position.z = .05;
+wheel.add(caliper);
+
+scene.add(wheel);
+
+/* floor reflection glow */
+const glow = new THREE.Mesh(new THREE.CircleGeometry(4, 64), new THREE.MeshBasicMaterial({color: RED, transparent: true, opacity: .07, depthWrite: false}));
+glow.rotation.x = -Math.PI / 2; glow.position.y = -2.4; glow.scale.set(1.4, .6, 1);
+
+
+/* lights */
+scene.add(new THREE.AmbientLight(0xffffff, .15));
+const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(4, 5, 6); scene.add(key);
+const rimL = new THREE.PointLight(RED, 60, 20); rimL.position.set(-4, 1, 2); scene.add(rimL);
+const rimR = new THREE.PointLight(0xff6a50, 40, 20); rimR.position.set(4, -2, -1); scene.add(rimR);
+
+/* speed particles */
+const COUNT = innerWidth < 700 ? 500 : 1100;
+const pos = new Float32Array(COUNT * 3), spd = new Float32Array(COUNT);
+for (let i = 0; i < COUNT; i++) {
+  pos[i*3] = (Math.random() - .5) * 30; pos[i*3+1] = (Math.random() - .5) * 16; pos[i*3+2] = -Math.random() * 30 + 4;
+  spd[i] = .4 + Math.random();
+}
+const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+const pMat = new THREE.PointsMaterial({color: 0xff5a45, size: .045, transparent: true, opacity: .75, depthWrite: false, blending: THREE.AdditiveBlending});
+const particles = new THREE.Points(pGeo, pMat);
+scene.add(particles);
+
+/* layout per viewport */
+function layout() {
+  const w = innerWidth, h = innerHeight, mob = w < 760;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+  base.x = mob ? .25 : 2.6; base.y = mob ? 1.45 : .35; base.s = mob ? .66 : 1;
+}
+const base = {x: 2.6, y: .35, s: 1};
+addEventListener('resize', layout); layout();
+
+/* input */
+const mouse = {x: 0, y: 0, tx: 0, ty: 0};
+addEventListener('pointermove', e => { mouse.tx = e.clientX / innerWidth - .5; mouse.ty = e.clientY / innerHeight - .5; });
+let scrollP = 0, lastY = scrollY, velocity = 0;
+addEventListener('scroll', () => { velocity += Math.abs(scrollY - lastY) * .002; lastY = scrollY; }, {passive: true});
+
+/* loop */
+const clock = new THREE.Clock();
+let visible = true;
+function frame() {
+  const dt = Math.min(clock.getDelta(), .05), t = clock.elapsedTime;
+  const vh = innerHeight;
+  scrollP = Math.min(scrollY / (vh * 1.6), 1);              // 0..1 over hero+statement
+  const fade = 1 - Math.min(Math.max((scrollY - vh * 1.3) / (vh * .6), 0), 1);
+  const e = scrollP * scrollP * (3 - 2 * scrollP);
+  canvas.style.opacity = fade * (1 - e * (innerWidth < 760 ? .6 : .35));
+  visible = fade > 0;
+  velocity *= .92;
+  if (visible) {
+    mouse.x += (mouse.tx - mouse.x) * .05; mouse.y += (mouse.ty - mouse.y) * .05;
+    const sp = reduce ? 0 : (1.2 + velocity * 6);
+    spin.rotation.z -= dt * sp;
+    // scroll choreography: wheel slides right, turns, grows
+    wheel.position.x = base.x * (1 - e) + (innerWidth < 760 ? 1.6 : 4.2) * e;
+    wheel.position.y = base.y * (1 - e) + (innerWidth < 760 ? -2.6 : -.3) * e + Math.sin(t * 1.2) * .06;
+    wheel.rotation.y = -.75 + e * .35 + mouse.x * .35;
+    wheel.rotation.x = .12 + mouse.y * .25;
+    wheel.scale.setScalar(base.s * (1 + e * .25));
+    camera.position.x = mouse.x * .6; camera.position.y = -mouse.y * .4; camera.lookAt(0, 0, 0);
+    // particles streaming
+    const arr = pGeo.attributes.position.array, boost = 1 + velocity * 10;
+    for (let i = 0; i < COUNT; i++) {
+      arr[i*3+2] += dt * spd[i] * 4 * boost;
+      if (arr[i*3+2] > 6) arr[i*3+2] = -26;
+    }
+    pGeo.attributes.position.needsUpdate = true;
+    rimL.intensity = 55 + Math.sin(t * 2) * 10;
+    renderer.render(scene, camera);
+  }
+  requestAnimationFrame(frame);
+}
+frame();
+</script>
 </body>
 </html>
