@@ -183,6 +183,39 @@ footer img{height:26px}
 .loader img{width:min(260px,60vw);animation:pulse 1.4s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.45;filter:drop-shadow(0 0 30px var(--red-glow))}}
 
+
+/* story */
+.story{height:900vh;position:relative;background:#05060a}
+.story-sticky{position:sticky;top:0;height:100vh;overflow:hidden}
+#story-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.story-shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(5,5,5,.75) 0%,rgba(5,5,5,.2) 45%,transparent 70%),linear-gradient(0deg,rgba(5,5,5,.6),transparent 30%)}
+.story-caps{position:absolute;left:0;right:0;bottom:12vh;pointer-events:none}
+.story-cap{position:absolute;bottom:0;max-width:520px;opacity:0;transform:translateY(30px);filter:blur(8px);transition:opacity .7s,transform .7s cubic-bezier(.2,.8,.2,1),filter .7s}
+.story-cap.on{opacity:1;transform:none;filter:none}
+.story-cap h3{font-size:clamp(36px,5vw,72px);font-weight:800;letter-spacing:-.04em;line-height:1;margin:14px 0 12px}
+.story-cap p{color:#c7c7cc;font-size:clamp(15px,1.4vw,18px)}
+.story-progress{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.08)}
+.story-progress i{display:block;height:100%;background:var(--red);transform-origin:left;transform:scaleX(0);box-shadow:0 0 12px var(--red)}
+@media(max-width:700px){.story-shade{background:linear-gradient(0deg,rgba(5,5,5,.9) 0%,rgba(5,5,5,.3) 45%,transparent 65%)}.story-caps{bottom:8vh}}
+
+/* departamentos */
+.depts{background:var(--ink);position:relative}
+.depts-grid{display:grid;grid-template-columns:1.1fr 1fr;width:min(1200px,100% - 40px);margin-inline:auto}
+.dept-stage{position:sticky;top:0;height:100vh;display:grid;place-items:center}
+#dept-canvas{width:100%;height:100%;display:block;position:relative;z-index:1}
+.dept-num{position:absolute;font-size:clamp(160px,26vw,380px);line-height:1;color:transparent;-webkit-text-stroke:1.5px rgba(221,50,34,.22);z-index:0;user-select:none}
+.dept-stage:before{content:"";position:absolute;width:70%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(221,50,34,.28),transparent 65%);filter:blur(30px)}
+.dept{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:40px 0 40px 40px;opacity:.18;transition:opacity .6s,transform .6s;transform:translateX(20px)}
+.dept.on{opacity:1;transform:none}
+.dept h3{font-size:clamp(40px,4.6vw,72px);font-weight:800;letter-spacing:-.045em;line-height:1;margin:16px 0 18px}
+.dept p{color:#c7c7cc;font-size:18px;max-width:440px}
+@media(max-width:900px){
+  .depts-grid{grid-template-columns:1fr}
+  .dept-stage{top:0;height:42vh;z-index:3;background:linear-gradient(var(--ink) 80%,transparent)}
+  .dept{min-height:62vh;padding:20px 0;justify-content:flex-start}
+  .dept p{font-size:16px}
+}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}.statement .w{opacity:1}}
 </style>
 <script type="importmap">{"imports":{"three":"./vendor/three.module.min.js"}}</script>
@@ -196,7 +229,8 @@ footer img{height:26px}
 <header class="nav">
   <a href="#" class="logo"><img src="logo-t.png" alt="BND Unlimited"></a>
   <ul>
-    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#story">El taller</a></li>
+    <li><a href="#depts">Departamentos</a></li>
     <li><a href="#banco">Banco de potencia</a></li>
     <li><a href="#proceso">Proceso</a></li>
     <li><a href="#contacto">Contacto</a></li>
@@ -241,12 +275,51 @@ footer img{height:26px}
     </div>
   </div>
 
+  <!-- STORY 3D -->
+  <section class="story" id="story">
+    <div class="story-sticky">
+      <canvas id="story-canvas"></canvas>
+      <div class="story-shade"></div>
+      <div class="story-caps wrap">
+        <div class="story-cap" data-from="0" data-to=".13"><span class="eyebrow">Paso 01</span><h3>Llegas al taller.</h3><p>Madrid. De noche o de día, tu coche en buenas manos.</p></div>
+        <div class="story-cap" data-from=".13" data-to=".3"><span class="eyebrow">Paso 02</span><h3>Se abren <span class="red">las puertas.</span></h3><p>Bienvenido a BND Unlimited.</p></div>
+        <div class="story-cap" data-from=".3" data-to=".47"><span class="eyebrow">Paso 03</span><h3>Directo al <span class="red">banco de potencia.</span></h3><p>Rodillos en las cuatro ruedas, como en nuestro taller.</p></div>
+        <div class="story-cap" data-from=".47" data-to=".62"><span class="eyebrow">Paso 04</span><h3>Entra el <span class="red">especialista.</span></h3><p>Diagnosis completa antes de tocar nada.</p></div>
+        <div class="story-cap" data-from=".62" data-to=".8"><span class="eyebrow">Paso 05</span><h3>Medimos. <span class="red">Ajustamos.</span></h3><p>Primero de serie, luego con el mapa BND.</p></div>
+        <div class="story-cap" data-from=".8" data-to="1.01"><span class="eyebrow">Paso 06</span><h3>El resultado, <span class="red">en pantalla.</span></h3><p>Sin promesas en el aire.</p></div>
+      </div>
+      <div class="story-progress"><i></i></div>
+    </div>
+  </section>
+
+  <!-- DEPARTAMENTOS 3D -->
+  <section class="depts" id="depts">
+    <div class="wrap head reveal" style="margin-bottom:0;padding-top:clamp(90px,14vh,160px)">
+      <span class="eyebrow">Departamentos</span>
+      <h2>Todo lo que tu coche<br><span class="red">necesita.</span></h2>
+    </div>
+    <div class="depts-grid">
+      <div class="dept-stage">
+        <div class="dept-num brand" id="dept-num">01</div>
+        <canvas id="dept-canvas"></canvas>
+      </div>
+      <div class="dept-list">
+        <article class="dept"><span class="eyebrow">01 · Electrónica</span><h3>Reprogramación ECU</h3><p>Mapas a medida para tu centralita: más potencia y par, mejor respuesta y consumo optimizado. Guardamos siempre tu software original.</p><div class="tags"><span>Stage 1 · 2 · 3</span><span>Cajas automáticas</span><span>Vuelta a serie</span></div></article>
+        <article class="dept"><span class="eyebrow">02 · Mantenimiento</span><h3>Aceite y filtros</h3><p>Aceite de calidad y filtros nuevos en cada cambio. Un motor con más potencia necesita estar siempre a punto.</p><div class="tags"><span>Cambio de aceite</span><span>Filtros de aire, aceite y habitáculo</span><span>Revisión</span></div></article>
+        <article class="dept"><span class="eyebrow">03 · Seguridad</span><h3>Frenos</h3><p>Si vas más rápido, tienes que frenar mejor. Discos, pastillas y líquido revisados y a punto.</p><div class="tags"><span>Discos</span><span>Pastillas</span><span>Líquido de frenos</span></div></article>
+        <article class="dept"><span class="eyebrow">04 · Agarre</span><h3>Neumáticos</h3><p>Toda la potencia del mundo no sirve si no llega al asfalto. Montaje, equilibrado y asesoramiento.</p><div class="tags"><span>Montaje</span><span>Equilibrado</span><span>Asesoramiento</span></div></article>
+        <article class="dept"><span class="eyebrow">05 · Electrónica</span><h3>Diagnosis</h3><p>Lectura de errores, revisión de sensores y registro de datos en marcha para saber exactamente cómo está tu coche.</p><div class="tags"><span>Lectura de errores</span><span>Sensores</span><span>Registro de datos</span></div></article>
+        <article class="dept"><span class="eyebrow">06 · Circuito</span><h3>Competición</h3><p>Cuando el rendimiento ha de ser maximizado, los ajustes tienen que ser milimétricos y no existe espacio para el error.</p><div class="tags"><span>Monitorización total</span><span>Equipo cualificado</span><span>Potenciaciones extremas</span></div></article>
+      </div>
+    </div>
+  </section>
+
   <!-- SERVICES -->
   <section class="block" id="servicios">
     <div class="wrap">
       <div class="head reveal">
         <span class="eyebrow">Servicios</span>
-        <h2>Dos formas de ir<br><span class="red">más rápido.</span></h2>
+        <h2>Turismos y<br><span class="red">competición.</span></h2>
       </div>
       <div class="cards">
         <article class="card reveal" data-tilt>
@@ -269,39 +342,6 @@ footer img{height:26px}
             <div class="tags"><span>Equipo altamente cualificado</span><span>Equipos de última generación</span><span>Monitorización total</span></div>
           </div>
         </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- DYNO -->
-  <section class="block" style="padding-top:0">
-    <div class="wrap dyno">
-      <div class="reveal">
-        <span class="eyebrow">Resultados medidos</span>
-        <h2 style="font-size:clamp(40px,5.4vw,80px);font-weight:800;letter-spacing:-.04em;line-height:.98;margin-top:18px">No te lo<br>contamos.<br><span class="red">Te lo enseñamos.</span></h2>
-        <p style="color:var(--muted);font-size:18px;margin-top:22px;max-width:460px">Medimos tu coche antes y después en el banco. Lo que gana, lo ves en la pantalla.</p>
-        <div class="stats">
-          <div class="stat"><b>Antes</b><span>Medición de serie</span></div>
-          <div class="stat"><b>Mapa</b><span>Ajustado a tu motor</span></div>
-          <div class="stat"><b class="red">Después</b><span>Medición final</span></div>
-        </div>
-      </div>
-      <div class="chart reveal">
-        <div class="legend"><span><b style="background:#5d5d63"></b>De serie</span><span><b style="background:var(--red)"></b>Reprogramado BND</span></div>
-        <svg viewBox="0 0 600 340" id="dyno">
-          <defs>
-            <linearGradient id="fillR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dd3222" stop-opacity=".35"/><stop offset="1" stop-color="#dd3222" stop-opacity="0"/></linearGradient>
-          </defs>
-          <g stroke="rgba(255,255,255,.07)" stroke-width="1">
-            <line x1="0" y1="60" x2="600" y2="60"/><line x1="0" y1="130" x2="600" y2="130"/><line x1="0" y1="200" x2="600" y2="200"/><line x1="0" y1="270" x2="600" y2="270"/>
-            <line x1="120" y1="20" x2="120" y2="310"/><line x1="240" y1="20" x2="240" y2="310"/><line x1="360" y1="20" x2="360" y2="310"/><line x1="480" y1="20" x2="480" y2="310"/>
-          </g>
-          <path id="fillArea" d="M0 300 C 80 240, 140 120, 230 80 S 420 50, 600 95 L600 310 L0 310Z" fill="url(#fillR)" opacity="0"/>
-          <path id="curveA" d="M0 300 C 90 260, 150 170, 240 145 S 430 130, 600 170" fill="none" stroke="#5d5d63" stroke-width="3" stroke-linecap="round"/>
-          <path id="curveB" d="M0 300 C 80 240, 140 120, 230 80 S 420 50, 600 95" fill="none" stroke="#dd3222" stroke-width="4" stroke-linecap="round" style="filter:drop-shadow(0 0 10px rgba(221,50,34,.8))"/>
-          <text x="0" y="330" fill="#5d5d63" font-size="12">RPM →</text>
-        </svg>
-        <small>CURVA ILUSTRATIVA · LOS RESULTADOS REALES DEPENDEN DE CADA VEHÍCULO</small>
       </div>
     </div>
   </section>
@@ -426,14 +466,6 @@ footer img{height:26px}
   gsap.utils.toArray('.reveal').forEach(el => {
     gsap.to(el, {opacity: 1, y: 0, duration: 1.1, ease: 'power3.out', scrollTrigger: {trigger: el, start: 'top 88%'}});
   });
-
-  // dyno curves draw
-  ['curveA', 'curveB'].forEach((id, i) => {
-    const path = document.getElementById(id), len = path.getTotalLength();
-    path.style.strokeDasharray = len; path.style.strokeDashoffset = len;
-    gsap.to(path, {strokeDashoffset: 0, ease: 'none', scrollTrigger: {trigger: '#dyno', start: 'top 80%', end: 'bottom 45%', scrub: 1 + i * .3}});
-  });
-  gsap.to('#fillArea', {opacity: 1, scrollTrigger: {trigger: '#dyno', start: 'top 40%', end: 'bottom 40%', scrub: true}});
 
   // image expand
   const mobile = matchMedia('(max-width:700px)').matches;
@@ -638,5 +670,7 @@ function frame() {
 }
 frame();
 </script>
+<script type="module" src="story.js"></script>
+<script type="module" src="depts.js"></script>
 </body>
 </html>
