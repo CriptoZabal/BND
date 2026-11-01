@@ -1,6 +1,8 @@
 // Escena 3D "llega el coche al taller" controlada por el scroll.
 import * as THREE from 'three';
 import { RoomEnvironment } from './vendor/RoomEnvironment.js';
+import { GLTFLoader } from './vendor/jsm/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from './vendor/jsm/libs/meshopt_decoder.module.js';
 
 const section = document.getElementById('story');
 const canvas = document.getElementById('story-canvas');
@@ -218,9 +220,67 @@ function buildCar() {
   const shadow = new THREE.Mesh(new THREE.PlaneGeometry(5.4, 2.6), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sh), transparent: true, depthWrite: false }));
   shadow.rotation.x = -Math.PI / 2; shadow.position.y = .03; car.add(shadow);
   car.userData.wheels = wheels;
+  car.userData.keep = [beam, beam.target, shadow];
   return car;
 }
 const car = buildCar(); scene.add(car);
+let mixer = null, actions = {}, currentAction = null;
+
+/* ---------- modelos 3D reales (coche + mecánico) ---------- */
+const gltf = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+gltf.load('models/car.glb', (g) => {
+  const model = g.scene;
+  // fuera logos de terceros (matrícula y emblema del volante)
+  ['License Plate', 'InteriorSteeringEmblem'].forEach((n) => { const o = model.getObjectByName(n); if (o) o.visible = false; });
+  // ruedas delanteras rectas y eje de giro de cada rueda
+  const rear = model.getObjectByName('WheelRearL');
+  const spinners = [];
+  model.updateMatrixWorld(true);
+  for (const n of ['WheelFrontL', 'WheelFrontR', 'WheelRearL', 'WheelRearR']) {
+    const w = model.getObjectByName(n); if (!w) continue;
+    if (n.startsWith('WheelFront') && rear) w.quaternion.copy(rear.quaternion);
+    w.updateMatrixWorld(true);
+    const q = new THREE.Quaternion(); w.getWorldQuaternion(q);
+    const axis = new THREE.Vector3(1, 0, 0).applyQuaternion(q.invert()).normalize();
+    // las pinzas no giran: se sacan de la rueda
+    [...w.children].forEach((c) => { if (/BrakePad/.test(c.name)) w.parent.attach(c); });
+    spinners.push({ w, base: w.quaternion.clone(), axis });
+  }
+  model.traverse((o) => { if (o.isMesh && o.material) { o.material.envMapIntensity = 1.4; } });
+  // frente del modelo = +z → nuestro coche mira a +x
+  const inner = new THREE.Group();
+  model.position.z = -.086;
+  inner.add(model); inner.rotation.y = Math.PI / 2;
+  // quitar coche provisional, conservar luces y sombra
+  const keep = car.userData.keep;
+  car.clear(); keep.forEach((k) => car.add(k));
+  car.add(inner);
+  const tmpQ = new THREE.Quaternion();
+  car.userData.wheels = spinners.map((s) => ({
+    set rotationZ(a) { tmpQ.setFromAxisAngle(s.axis, -a); s.w.quaternion.copy(s.base).multiply(tmpQ); },
+  }));
+  car.userData.real = true;
+});
+gltf.load('models/mechanic.glb', (g) => {
+  const bot = g.scene;
+  bot.traverse((o) => {
+    if (!o.isMesh) return;
+    o.frustumCulled = false;
+    o.material = o.material.name === 'Beta_Joints_MAT'
+      ? new THREE.MeshStandardMaterial({ color: RED, metalness: .4, roughness: .35, emissive: RED, emissiveIntensity: .2 })
+      : new THREE.MeshStandardMaterial({ color: 0x1b1b20, metalness: .3, roughness: .55 });
+    o.material.skinning = true;
+  });
+  mech.clear(); mech.add(bot); mech.userData.real = true;
+  mixer = new THREE.AnimationMixer(bot);
+  g.animations.forEach((a) => { actions[a.name] = mixer.clipAction(a); });
+});
+function playAction(name) {
+  if (!mixer || !actions[name] || currentAction === name) return;
+  const next = actions[name]; next.reset().setEffectiveWeight(1).fadeIn(.35).play();
+  if (currentAction && actions[currentAction]) actions[currentAction].fadeOut(.35);
+  currentAction = name;
+}
 
 /* ---------- mechanic ---------- */
 function buildMechanic() {
@@ -312,7 +372,8 @@ function update(p, t, dt) {
   const run = range(p, .6, .96);
   const running = run > 0 && run < 1 ? 1 : (run >= 1 ? .4 : 0);
   spinExtra += dt * running * 28;
-  for (const w of car.userData.wheels) w.rotation.z = -(dist / .41) - spinExtra;
+  const wa = -(dist / .384) - spinExtra;
+  for (const w of car.userData.wheels) { if (car.userData.real) w.rotationZ = wa; else w.rotation.z = wa; }
   for (const r of rollers) r.rotation.x = spinExtra * 2.2;
   car.position.y = running ? Math.sin(t * 40) * .004 : 0;
 
@@ -330,11 +391,16 @@ function update(p, t, dt) {
   mech.position.lerpVectors(from, to, ease(wk));
   const walking = wk > 0 && wk < 1;
   mech.rotation.y = wk < 1 ? Math.atan2(to.x - from.x, to.z - from.z) : Math.PI;
-  const { legL, legR, armL, armR } = mech.userData;
-  const sw = walking ? Math.sin(t * 9) * .55 : 0;
-  legL.rotation.x = sw; legR.rotation.x = -sw;
-  if (wk >= 1) { armL.rotation.x = -1.0 + Math.sin(t * 14) * .08; armR.rotation.x = -1.0 + Math.cos(t * 13) * .08; }
-  else { armL.rotation.x = -sw * .8; armR.rotation.x = sw * .8; }
+  if (mech.userData.real) {
+    playAction(walking ? 'walk' : (run > .82 ? 'agree' : 'idle'));
+    if (mixer) mixer.update(dt);
+  } else {
+    const { legL, legR, armL, armR } = mech.userData;
+    const sw = walking ? Math.sin(t * 9) * .55 : 0;
+    legL.rotation.x = sw; legR.rotation.x = -sw;
+    if (wk >= 1) { armL.rotation.x = -1.0 + Math.sin(t * 14) * .08; armR.rotation.x = -1.0 + Math.cos(t * 13) * .08; }
+    else { armL.rotation.x = -sw * .8; armR.rotation.x = sw * .8; }
+  }
 
   // exhaust
   const arr = exGeo.attributes.position.array;
