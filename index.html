@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BND Unlimited Madrid</title>
+<meta name="description" content="BND Unlimited Madrid · Reprogramación de vehículos en Madrid. Turismos, competición y banco de potencia.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@1,700;1,800;1,900&family=Fira+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#dd3222; --red2:#f0412f;
+    --black:#060606; --bg:#18181b; --bg2:#202024; --card:#111113; --line:#2c2c31;
+    --text:#f4f4f5; --muted:#a6a6ae;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:"Fira Sans",system-ui,sans-serif;line-height:1.6;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  img{display:block;max-width:100%}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+  .h{font-family:"Exo 2",sans-serif;font-style:italic;font-weight:800;text-transform:uppercase;line-height:1.02;letter-spacing:.01em}
+
+  .demo{background:#ffd400;color:#111;text-align:center;font-size:13px;font-weight:600;padding:6px 12px}
+
+  header{position:sticky;top:0;z-index:20;background:var(--black);border-bottom:2px solid var(--red)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:76px;gap:16px}
+  .nav .logo img{height:46px;width:auto}
+  .social{display:flex;gap:14px}
+  .social a{width:34px;height:34px;display:grid;place-items:center;border-radius:6px;color:var(--red);transition:.2s}
+  .social a:hover{background:var(--red);color:#fff}
+  .social svg{width:20px;height:20px;fill:currentColor}
+  nav ul{display:flex;gap:26px;list-style:none;font-weight:500;font-size:15px;color:var(--muted)}
+  nav a:hover{color:var(--red)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--red);color:#fff;font-weight:600;padding:13px 24px;border-radius:4px;transition:.2s;border:0;cursor:pointer;font-size:15px;font-family:inherit}
+  .btn:hover{background:var(--red2);transform:translateY(-1px)}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.35)}
+  .btn.ghost:hover{border-color:#fff}
+  @media(max-width:900px){nav ul,.nav .btn{display:none}.nav{justify-content:space-between}.nav .logo img{height:38px}}
+
+  .hero{position:relative;min-height:min(86vh,760px);display:flex;align-items:center;text-align:center;
+    background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.75) 70%,var(--bg)),url(dyno.jpg) center/cover no-repeat}
+  .hero .wrap{position:relative;width:100%}
+  .hero h1{font-size:clamp(46px,9vw,112px);font-weight:900}
+  .hero h1 span{color:var(--red)}
+  .hero .sub{font-family:"Exo 2";font-style:italic;font-weight:700;letter-spacing:.18em;text-transform:uppercase;font-size:clamp(15px,2.3vw,24px);margin-top:14px}
+  .hero p{color:#d4d4d8;max-width:600px;margin:22px auto 34px;font-size:clamp(16px,1.8vw,18px)}
+  .cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+  .down{display:block;width:36px;margin:54px auto 0;opacity:.85;animation:b 2s infinite}
+  @keyframes b{50%{transform:translateY(8px)}}
+
+  section{padding:96px 0}
+  .title{text-align:center;margin-bottom:54px}
+  .title h2{font-size:clamp(40px,6vw,68px);color:var(--red)}
+  .title p{color:var(--muted);max-width:600px;margin:14px auto 0}
+
+  .svc{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:28px}
+  .svc article{background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden;transition:.25s;display:flex;flex-direction:column}
+  .svc article:hover{border-color:var(--red);transform:translateY(-4px)}
+  .svc img{aspect-ratio:16/8;object-fit:cover;width:100%}
+  .svc .body{padding:28px 30px 34px;text-align:center}
+  .svc h3{font-size:clamp(30px,4vw,40px);color:var(--red);margin-bottom:12px}
+  .svc p{color:#e4e4e7;font-size:16.5px}
+  .svc b{font-weight:600}
+
+  .band{background:var(--black);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .split{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:center}
+  @media(max-width:860px){.split{grid-template-columns:1fr}}
+  .split img{border-radius:6px;border:1px solid var(--line)}
+  .split h2{font-size:clamp(36px,5vw,56px)}
+  .split h2 span{color:var(--red)}
+  .split p{color:var(--muted);margin:18px 0 26px}
+  .checks{list-style:none;display:grid;gap:10px;margin-bottom:30px}
+  .checks li{padding-left:28px;position:relative}
+  .checks li:before{content:"";position:absolute;left:0;top:7px;width:14px;height:10px;border-left:3px solid var(--red);border-bottom:3px solid var(--red);transform:rotate(-45deg)}
+
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:22px;counter-reset:s}
+  .step{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--red);padding:28px;border-radius:4px}
+  .step:before{counter-increment:s;content:"0" counter(s);font-family:"Exo 2";font-style:italic;font-weight:900;font-size:42px;color:#36363c;display:block;line-height:1}
+  .step h3{font-size:24px;margin:10px 0 8px}
+  .step p{color:var(--muted);font-size:15px}
+
+  .contact{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+  @media(max-width:860px){.contact{grid-template-columns:1fr}}
+  .info{display:grid;gap:14px}
+  .info div{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--red);padding:18px 20px;border-radius:4px}
+  .info small{display:block;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .info b{font-size:17px;font-weight:600}
+  form{background:var(--card);border:1px solid var(--line);padding:28px;border-radius:6px;display:grid;gap:14px}
+  form h3{font-size:28px}
+  input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);padding:13px 14px;border-radius:4px;font:inherit;font-size:15px}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--red)}
+  textarea{min-height:110px;resize:vertical}
+
+  footer{background:var(--black);border-top:2px solid var(--red);padding:36px 0;color:var(--muted);font-size:14px}
+  footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+  footer img{height:34px;width:auto}
+
+  .wa{position:fixed;right:18px;bottom:18px;z-index:30;width:60px;height:60px;border-radius:50%;background:var(--red);display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.5);transition:.2s}
+  .wa:hover{transform:scale(1.06)}
+  .wa svg{width:32px;height:32px;fill:#fff}
+</style>
+</head>
+<body>
+
+<div class="demo">Propuesta de diseño · versión provisional</div>
+
+<header>
+  <div class="wrap nav">
+    <div class="social">
+      <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8C2.4 3.9 3.9 2.4 7.2 2.3 8.4 2.2 8.8 2.2 12 2.2zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7 1.2.1 1.6.1 4.9.1s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 0 0 0-12.4zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-11.8a1.4 1.4 0 1 0 0 2.9 1.4 1.4 0 0 0 0-2.9z"/></svg></a>
+      <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg></a>
+    </div>
+    <a href="#" class="logo"><img src="logo.png" alt="BND Unlimited"></a>
+    <nav><ul>
+      <li><a href="#servicios">Servicios</a></li>
+      <li><a href="#banco">Banco de potencia</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul></nav>
+    <a href="#contacto" class="btn">Pide cita</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <h1 class="h">BND Unlimited<br><span>Madrid</span></h1>
+    <div class="sub">Reprogramación de vehículos</div>
+    <p>Más potencia y más par sin perder fiabilidad. Mapas a medida, probados en nuestro banco de potencia.</p>
+    <div class="cta">
+      <a href="#contacto" class="btn">Pide presupuesto</a>
+      <a href="#servicios" class="btn ghost">Nuestros servicios</a>
+    </div>
+    <a href="#servicios" class="down" aria-label="Bajar"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8l8 8 8-8"/></svg></a>
+  </div>
+</section>
+
+<section id="servicios">
+  <div class="wrap">
+    <div class="title"><h2 class="h">Nuestros servicios</h2></div>
+    <div class="svc">
+      <article>
+        <img src="audi.jpg" alt="Audi en el banco de potencia de BND Madrid">
+        <div class="body">
+          <h3 class="h">Turismos</h3>
+          <p>Ponemos a tu disposición la tecnología y profesionalidad necesarios para que puedas reprogramar tu coche optimizando sus parámetros: <b>aumento de potencia y par</b> manteniendo la <b>fiabilidad</b>, <b>reducción de consumo</b>, o <b>potenciaciones extremas</b>.</p>
+        </div>
+      </article>
+      <article>
+        <img src="bmw.jpg" alt="BMW en el banco de potencia de BND Madrid">
+        <div class="body">
+          <h3 class="h">Competición</h3>
+          <p>Cuando el rendimiento ha de ser maximizado, los ajustes tienen que ser milimétricos y no existe espacio para el error. Por ello ponemos a tu disposición un equipo humano altamente cualificado y los equipos más modernos para monitorizar todos los parámetros durante el desarrollo.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="banco" class="band">
+  <div class="wrap split">
+    <img src="dyno.jpg" alt="Banco de potencia de BND Madrid">
+    <div>
+      <h2 class="h">Banco de <span>potencia</span></h2>
+      <p>Medimos tu coche antes y después de reprogramarlo. Sin promesas en el aire: lo que gana tu coche lo ves en la pantalla.</p>
+      <ul class="checks">
+        <li>Medición de potencia y par reales</li>
+        <li>Ajuste del mapa con el coche en el rodillo</li>
+        <li>Control de todos los parámetros del motor</li>
+      </ul>
+      <a href="#contacto" class="btn">Reserva tu medición</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="title"><h2 class="h">Cómo trabajamos</h2></div>
+    <div class="steps">
+      <div class="step"><h3 class="h">Diagnosis</h3><p>Revisamos el coche y comprobamos que está sano antes de empezar.</p></div>
+      <div class="step"><h3 class="h">Medición</h3><p>Pasamos por el banco para saber de dónde partimos.</p></div>
+      <div class="step"><h3 class="h">Mapa a medida</h3><p>Ajustamos la centralita para tu motor y lo que buscas.</p></div>
+      <div class="step"><h3 class="h">Verificación</h3><p>Volvemos a medir y te entregamos el coche con los resultados.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="contacto" class="band">
+  <div class="wrap contact">
+    <div>
+      <div class="title" style="text-align:left;margin-bottom:28px">
+        <h2 class="h">Contacto</h2>
+        <p style="margin-left:0">Dinos marca, modelo, año y motor, y te contamos qué se puede hacer con tu coche.</p>
+      </div>
+      <div class="info">
+        <div><small>Dirección</small><b>[Dirección del taller], Madrid</b></div>
+        <div><small>Teléfono / WhatsApp</small><b>[600 000 000]</b></div>
+        <div><small>Horario</small><b>[Horario]</b></div>
+      </div>
+    </div>
+    <form onsubmit="event.preventDefault();this.querySelector('button').textContent='¡Recibido! Te contactamos pronto';">
+      <h3 class="h">Pide presupuesto</h3>
+      <input placeholder="Nombre" required>
+      <input placeholder="Teléfono" type="tel" required>
+      <input placeholder="Coche (marca, modelo, año, motor)" required>
+      <select><option>Turismo</option><option>Competición</option><option>Banco de potencia</option><option>Otro</option></select>
+      <textarea placeholder="Cuéntanos qué buscas"></textarea>
+      <button class="btn" type="submit">Enviar</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <img src="logo.png" alt="BND Unlimited">
+    <span>© 2026 BND Unlimited Madrid · Reprogramación de vehículos</span>
+  </div>
+</footer>
+
+<a class="wa" href="#contacto" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.1.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>
+</a>
+
+</body>
+</html>
